@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>盲抽行程選擇器</title>
+  <style>
+  body {
+  font-family: 'Segoe UI', 'Noto Sans TC', sans-serif;
+  background-color: #fdfcf9;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  color: #333;
+}
+
+.main-title {
+  font-size: 2.2em;
+  margin-top: 30px;
+  color: #5b4c3c;
+}
+
+.result-title {
+  font-size: 1.8em;
+  margin-top: 30px;
+  color: #5b4c3c;
+}
+
+#question-title {
+  color: #6d584c;
+  font-weight: bold;
+  margin: 20px 0 10px;
+  font-size: 1.3em;
+}
+
+#question-text {
+  font-size: 1.1em;
+  margin-bottom: 20px;
+}
+
+#question-img {
+  max-width: 80%;
+  height: auto;
+  margin: 0 auto 20px;
+  display: block;
+}
+
+#options {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  padding: 0 10px;
+}
+
+.option-button {
+  font-size: 1em;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  min-width: 150px;
+  max-width: 300px;
+  word-break: break-word;
+  white-space: normal;
+}
+
+.option-button:hover {
+  filter: brightness(95%);
+  transform: scale(1.02);
+}
+
+.result {
+  font-size: 1.3em;
+  margin-top: 20px;
+  padding: 0 20px;
+}
+
+.confetti {
+  font-size: 2em;
+  animation: fall 1s ease-in-out infinite alternate;
+}
+
+/* 動畫 */
+@keyframes fall {
+  0% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(10px);
+  }
+}
+
+/* 手機版調整 */
+@media (max-width: 600px) {
+  .option-button {
+    font-size: 0.95em;
+    padding: 10px 16px;
+    min-width: 100px;
+  }
+
+  #question-title {
+    font-size: 1.15em;
+  }
+
+  .result-title {
+    font-size: 1.5em;
+  }
+}
+  </style>
+</head>
+
+<body>
+  <h1 class="main-title">🎉 歡迎來到行程抽抽樂~ 🎉</h1>
+  <h3 id="question-title"></h3>
+  <p id="question-text"></p>
+  <img id="question-img" src="" alt="Question Image" style="max-width: 200px; height: auto; display: none;" />
+  <div id="options"></div>
+
+  <script>
+    const questions = {
+      Q1: {
+        title: "🎲 第一抽：這次要去哪裡玩好呢？🥰",
+        image: "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEjqdtiAxX1kXkZvapLjWgOA8NnVpG8LzWzhoxj8nDynHd27bJwMFkA-0X4NeOhvmZDcuLNKueNQu6209hWgaRbGjcXmqQ7xNvOtwC-XgqCm6K3QX_60Ll8JML_BZXy8RRRYsbWeCKM_SPQ/s400/kids_air_fuwafuwa_yuugu.png",
+        options: [
+          { text: "選我選我！！ヾ(≧▽≦*)o", location: "圖書館", next: "Q2" },
+          { text: "確定要略過我？你會後悔喔(^///^)", location: "北投溫泉(+圖書館)", next: "Q2" },
+          { text: "在幹嘛...你愛選不選，隨便", location: "南港LaLaport", next: "Q2" },
+          { text: "我是不是很可愛呀(❤️´艸｀❤️)", location: "士林官邸", next: "Q2" },
+          { text: "嗨，想知道我是誰嗎~ ( ͡~ ͜ʖ ͡°)", location: "展覽館及園區", next: "Q2" },
+          { text: "你喜歡的(嗎？)(◔◡◔)", location: "運動", next: "Q2" },
+          { text: "欸嘿嘿嘿嘿嘿", location: "淡水漁人碼頭", next: "Q2" },
+          { text: "來來~(招手", location: "自行安排行程給對方", next: "Q2" },
+        ]
+      },
+      Q2: {
+        title: "📍 第二抽：請繼續(嘿嘿嘿",
+        image: "",
+        options: [
+          { text: "嘿", location: "新北總圖(愛買旁)+老地方❤️", next: "Q3" },
+          { text: "嘿", location: "北投圖書館+溫泉放鬆❤️", next: "Q3" },
+          { text: "嘿", location: "桃園圖書館+沙丘❤️", next: "Q3" },
+          { text: "嘿", location: "國圖1+中正紀念堂(?)", next: "Q3" },
+          { text: "嘿", location: "西門國圖2+老地方❤️", next: "Q3" },
+        ]
+      },
+      Q3: {
+        title: "🍟 第三抽：好吃的來啦~~",
+        image: "",
+        options: [
+          { text: "如果你以為我是漢堡就大錯特錯了☝️", location: "麥當當🍟(或早午餐)", next: "END" },
+          { text: "好吃的桃子?(才怪🤪", location: "北投圖書館+溫泉放鬆❤️", next: "END" },
+          { text: "不告訴尼😛", location: "桃園圖書館+沙丘❤️", next: "END" },
+          { text: "果然還是飯飯最好吧🙂‍↕️", location: "國圖1+中正紀念堂(?)", next: "END" },
+          { text: "麥當當！麥當當！麥當當！🤩", location: "西門國圖2+老地方❤️", next: "Q4" },
+        ]
+      },
+      Q4: {
+        title: "🍟 第三抽：好吃的來啦~~",
+        image: "",
+        options: [
+          { text: "如果你以為我是漢堡就大錯特錯了☝️", location: "早午餐", next: "END" },
+          { text: "好吃的桃子?(才怪🤪", location: "麥當當/肯德基爺爺/頂呱呱", next: "END" },
+          { text: "不告訴尼😛", location: "丼飯/味噌/咖哩任選", next: "END" },
+          { text: "果然還是飯飯最好吧🙂‍↕️", location: "看當天的心情決定", next: "END" },
+          { text: "麥當當！麥當當！麥當當！🤩", location: "那就來個義大利麵吧(或是其他麵麵也行)", next: "Q4" },
+        ]
+      }
+    };
+
+    const pastelColors = ["#f6c6ea", "#c6ecf6", "#f6eac6", "#d5f6c6", "#e0c6f6"];
+
+    let current = "Q1";
+    let answers = [];
+
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function renderQuestion() {
+      const q = questions[current];
+      const container = document.getElementById("options");
+      const img = document.getElementById("question-img");
+      const text = document.getElementById("question-text");
+      const title = document.getElementById("question-title");
+
+      container.innerHTML = "";
+      img.src = q.image;
+      img.style.display = q.image ? "block" : "none";
+      text.textContent = "請選擇一個你看順眼的選項╰(*°▽°*)╯";
+      title.textContent = q.title || "";
+
+      const shuffled = shuffle([...q.options]);
+      shuffled.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-button";
+        btn.style.backgroundColor = pastelColors[Math.floor(Math.random() * pastelColors.length)];
+        btn.textContent = opt.text;
+        btn.onclick = () => {
+          answers.push(opt.location);
+          setTimeout(() => {
+            if (opt.next === "END") {
+              displayResults();
+            } else {
+              current = opt.next;
+              renderQuestion();
+            }
+          }, 800);
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function displayResults() {
+      document.body.innerHTML = `
+        <h1 class="result-title">🎊 本次的盲抽行程是！🎊</h1>
+        <div class="result">
+          ${answers.join(" + ")}<br><br>
+          <div class="confetti">✨🎉✨🎉✨🎉✨🎉✨</div>
+        </div>
+      `;
+    }
+
+    renderQuestion();
+  </script>
+</body>
+
+</html>
